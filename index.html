@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Храним бюджет</title>
+
+        <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+        <link href="assets/css/budget.css" rel="stylesheet">
+        <link href="assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+              type="text/css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+    <body id="page-top" class="index">
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header page-scroll">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Навигация</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand">Храним бюджет</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="hidden">
+                            <a href="#page-top"></a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="#categories">Категории</a>
+                        </li>
+                        <li class="page-scroll">
+                            <a href="#spending">Затраты</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+
+        <!-- Content -->
+        <div class="main-container container">
+            <div class="categories-index">
+            </div>
+        </div>
+
+        <script type="text/template" id="tpl-categories">
+            <p>
+                <a class="btn btn-success" href="#category/new">Новая категория</a>
+            </p>
+            <ul class="category-list">
+            </ul>
+        </script>
+
+        <script type="text/template" id="tpl-category">
+            <div class="col-md-10"><%- name %></div>
+            <div class="col-md-2">
+                <a class="btn btn-info glyphicon glyphicon-pencil management-help" href="#category/edit/<%- id %>"></a>
+                <a class="btn btn-danger glyphicon glyphicon-remove management-help delete-category" href="#category/delete/<%- id %>"></a>
+            </div>
+        </script>
+
+        <script type="text/template" id="tpl-new-category">
+            <h1><%= isNew ? 'СОЗДАНИЕ' : 'РЕДАКТИРОВАНИЕ' %> КАТЕГОРИИ</h1>
+            <div class="category-form">
+                <form class="category-form">
+                    <div class="form-group field-category-title">
+                        <label class="control-label" for="category-title">Название</label>
+                        <input type="text" id="category-title" class="form-control category-name-input" value="<%- name %>" maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-3">
+                            <button type="submit" class="btn btn-success btn-lg btn-block">Отправить</button>
+                        </div>
+                        <div class="col-sm-3">
+                            <a href="#categories" class="btn btn-danger btn-lg btn-block">Отмена</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </script>
+
+
+        <script type="text/template" id="tpl-spending">
+            <p>
+                <a class="btn btn-success" href="#spending/new">Новая запись</a>
+            </p>
+            <ul class="category-list spending-list">
+            </ul>
+        </script>
+
+        <script type="text/template" id="tpl-spendingItem">
+            <div class="col-md-4"><%- title %></div>
+            <div class="col-md-3">( <%- categoryName %> )</div>
+            <div class="col-md-3"> - <%- cost %></div>
+            <div class="col-md-2">
+                <a class="btn btn-info glyphicon glyphicon-pencil management-help" href="#spending/edit/<%- id %>"></a>
+                <a class="btn btn-danger glyphicon glyphicon-remove management-help delete-spending" href="#spending/delete/<%- id %>"></a>
+            </div>
+        </script>
+
+        <script type="text/template" id="tpl-new-spending">
+            <h1><%= isNew ? 'СОЗДАНИЕ' : 'РЕДАКТИРОВАНИЕ' %> ЗАТРАТ</h1>
+            <div class="spending-form">
+                <form class="spending-form">
+                    <div class="form-group field-spending-title">
+                        <label class="control-label" for="spending-title">Описание</label>
+                        <input type="text" id="spending-title" class="form-control spending-title-input" value="<%- title %>" maxlength="255">
+                    </div>
+                    <div class="form-group field-spending-cost">
+                        <label class="control-label" for="spending-cost">Затраты</label>
+                        <input type="text" id="spending-cost" class="form-control spending-cost-input" value="<%- cost %>" maxlength="255">
+                    </div>
+                    <div class="form-group field-spending-category">
+                        <label class="control-label" for="spending-category">Категория</label>
+                        <select id="spending-category" class="form-control spending-category-input">
+                            <% _.each(categoryList, function(field){ %>
+                                <option value ="<%= field.id%>" <%- (field.id == category) ? 'selected' : '' %>><%- field.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-3">
+                            <button type="submit" class="btn btn-success btn-lg btn-block">Отправить</button>
+                        </div>
+                        <div class="col-sm-3">
+                            <a href="#spending" class="btn btn-danger btn-lg btn-block">Отмена</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </script>
+
+        <script type="text/template" id="tpl-notFound">
+            <div class="col-md-12">Ничего не найдено</div>
+        </script>
+
+        <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+        <div class="scroll-top page-scroll visible-xs visible-sm">
+            <a class="btn btn-primary" href="#page-top">
+                <i class="fa fa-chevron-up"></i>
+            </a>
+        </div>
+
+        <!-- jQuery -->
+        <script src="assets/js/lib/vendor/jquery.js"></script>
+
+        <!-- Bootstrap Core JavaScript -->
+        <script src="assets/js/lib/vendor/bootstrap.min.js"></script>
+
+        <!-- Plugin JavaScript -->
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+        <script src="assets/js/lib/vendor/classie.js"></script>
+        <script src="assets/js/lib/vendor/cbpAnimatedHeader.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="assets/js/lib/budget.js"></script>
+
+        <!-- Marionette JS -->
+        <script src="assets/js/lib/vendor/underscore.js"></script>
+        <script src="assets/js/lib/vendor/backbone.js"></script>
+        <script src="assets/js/lib/vendor/backbone.marionette.js"></script>
+
+        <!-- Application -->
+        <script src="assets/js/app/app.js"></script>
+        <script src="assets/js/app/models/category.js"></script>
+        <script src="assets/js/app/models/spending.js"></script>
+        <script src="assets/js/app/collections/category.js"></script>
+        <script src="assets/js/app/collections/spending.js"></script>
+        <script src="assets/js/app/views/base/baseView.js"></script>
+        <script src="assets/js/app/views/category/categories.js"></script>
+        <script src="assets/js/app/views/category/category.js"></script>
+        <script src="assets/js/app/views/category/categoryForm.js"></script>
+        <script src="assets/js/app/views/spending/spending.js"></script>
+        <script src="assets/js/app/views/spending/spendingItem.js"></script>
+        <script src="assets/js/app/views/spending/spendingForm.js"></script>
+        <script src="assets/js/app/router.js"></script>
+
+        <script>
+            $(function() {
+                SaveBudget.start({
+                    categories: [
+                        {
+                            id: 1,
+                            name : 'Автомобиль'
+                        },
+                        {
+                            id: 2,
+                            name : 'Еда'
+                        },
+                        {
+                            id: 3,
+                            name : 'Кредит'
+                        },
+                        {
+                            id: 4,
+                            name : 'Пополнение счета'
+                        },
+                        {
+                            id: 5,
+                            name : 'Интернет'
+                        },
+                        {
+                            id: 6,
+                            name : 'За квартиру'
+                        }
+                    ]
+                });
+            });
+        </script>
+    </body>
+</html>
