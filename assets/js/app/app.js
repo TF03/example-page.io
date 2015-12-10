@@ -103,6 +103,8 @@ window.SaveBudget = {
             }
         });
 
-        Backbone.history.start();
+        if (Backbone.history) {
+            Backbone.history.start();
+        }
     }
 };
